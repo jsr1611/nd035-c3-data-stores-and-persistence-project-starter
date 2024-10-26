@@ -1,6 +1,7 @@
 package com.udacity.jdnd.course3.critter.pet;
 
 import com.udacity.jdnd.course3.critter.common.NotFoundException;
+import com.udacity.jdnd.course3.critter.common.Utility;
 import com.udacity.jdnd.course3.critter.user.Customer;
 import com.udacity.jdnd.course3.critter.user.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,11 +43,8 @@ public class PetServiceImpl implements PetService{
     @Override
     public PetDTO getPetDTOById(long petId) {
         Optional<Pet> petOptional = petRepository.findById(petId);
-        PetDTO dto = null;
-        if(petOptional.isPresent()){
-            dto = convertEntityToDTO(petOptional.get());
-        }
-        return dto;
+        Utility.getInstance().throwExceptionIf(petOptional, "No pet was found for the given id: " + petId);
+        return convertEntityToDTO(petOptional.get());
     }
 
     @Override
@@ -64,11 +62,8 @@ public class PetServiceImpl implements PetService{
     @Override
     public List<PetDTO> getPetsByOwner(long ownerId) {
         List<Pet> pets = petRepository.findAllByOwner(ownerId);
-        List<PetDTO> dtos = null;
-        if(pets != null){
-            dtos = pets.stream().map(this::convertEntityToDTO).collect(Collectors.toList());
-        }
-        return dtos;
+        Utility.getInstance().throwExceptionIf(pets, "No pets found for the given owner id: " + ownerId);
+        return pets.stream().map(this::convertEntityToDTO).collect(Collectors.toList());
     }
 
     private Pet convertDTOToEntity(PetDTO petDTO) {
@@ -102,6 +97,7 @@ public class PetServiceImpl implements PetService{
     @Override
     public Customer getOwnerByPet(long petId) {
         Optional<Pet> optionalPet = petRepository.findById(petId);
-        return optionalPet.map(Pet::getOwner).orElse(null);
+        Utility.getInstance().throwExceptionIf(optionalPet, "No customer found for the given pet id: " + petId);
+        return optionalPet.get().getOwner();
     }
 }

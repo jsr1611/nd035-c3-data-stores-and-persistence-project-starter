@@ -1,6 +1,7 @@
 package com.udacity.jdnd.course3.critter.user;
 
 import com.udacity.jdnd.course3.critter.common.NotFoundException;
+import com.udacity.jdnd.course3.critter.common.Utility;
 import com.udacity.jdnd.course3.critter.pet.Pet;
 import com.udacity.jdnd.course3.critter.pet.PetService;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
     @Autowired
     private CustomerRepository customerRepository;
@@ -53,7 +54,8 @@ public class UserServiceImpl implements UserService{
     @Override
     public EmployeeDTO getEmployeeDTOById(long employeeId) {
         Employee employee = getEmployeeById(employeeId);
-        return employee != null ? convertEntityToDTO(employee) : null;
+        if (employee != null) return convertEntityToDTO(employee);
+        else throw new NotFoundException("No employee was found with given id: " + employeeId);
     }
 
     @Override
@@ -61,13 +63,13 @@ public class UserServiceImpl implements UserService{
         log.info("setting employee schedule");
         Employee employee = null;
         Optional<Employee> optionalEmployee = employeeRepository.findById(employeeId);
-        if(optionalEmployee.isPresent()){
+        if (optionalEmployee.isPresent()) {
             employee = optionalEmployee.get();
             employee.setDaysAvailable(daysAvailable);
             employeeRepository.save(employee);
             log.info("Employee schedule was set successfully");
-        }else {
-            throw new NotFoundException("Employee not found with id: "+employeeId);
+        } else {
+            throw new NotFoundException("Employee not found with id: " + employeeId);
         }
     }
 
@@ -77,10 +79,8 @@ public class UserServiceImpl implements UserService{
         LocalDate date = employeeDTO.getDate();
         DayOfWeek dayOfWeek = DayOfWeek.from(date);
         Set<Employee> employees = employeeRepository.findAllByAvailability(dayOfWeek);
-        if(employees.isEmpty()){
-            throw new NotFoundException("No employee found available for the given date and activities");
-        }
-        return employees
+        Utility.getInstance().throwExceptionIf(employees, "No employee found available for the given date and activities");
+         return employees
                 .stream()
                 .filter(entity -> entity.getSkills().containsAll(employeeDTO.getSkills()))
                 .map(this::convertEntityToDTO)
@@ -93,7 +93,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public Customer convertDTOToEntity(CustomerDTO dto){
+    public Customer convertDTOToEntity(CustomerDTO dto) {
         Customer entity = new Customer();
         entity.setId(dto.getId());
         entity.setName(dto.getName());
@@ -111,13 +111,13 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public CustomerDTO convertEntityToDTO(Customer entity){
+    public CustomerDTO convertEntityToDTO(Customer entity) {
         CustomerDTO dto = new CustomerDTO();
         dto.setId(entity.getId());
         dto.setName(entity.getName());
         dto.setNotes(entity.getNotes());
         dto.setPhoneNumber(entity.getPhoneNumber());
-        if(entity.getPets() != null){
+        if (entity.getPets() != null) {
             List<Long> petIds = entity.getPets().stream()
                     .map(Pet::getId)
                     .collect(Collectors.toList());
@@ -127,7 +127,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public EmployeeDTO convertEntityToDTO(Employee entity){
+    public EmployeeDTO convertEntityToDTO(Employee entity) {
         EmployeeDTO dto = new EmployeeDTO();
         dto.setId(entity.getId());
         dto.setName(entity.getName());
