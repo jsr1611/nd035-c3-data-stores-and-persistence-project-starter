@@ -77,16 +77,14 @@ public class UserServiceImpl implements UserService{
         LocalDate date = employeeDTO.getDate();
         DayOfWeek dayOfWeek = DayOfWeek.from(date);
         Set<Employee> employees = employeeRepository.findAllByAvailability(dayOfWeek);
-        List<EmployeeDTO> employeeDTOList = new ArrayList<>();
-
-        if(!employees.isEmpty()){
-            employeeDTOList = employees
-                    .stream()
-                    .filter(entity -> entity.getSkills().containsAll(employeeDTO.getSkills()))
-                    .map(this::convertEntityToDTO)
-                    .collect(Collectors.toList());
+        if(employees.isEmpty()){
+            throw new NotFoundException("No employee found available for the given date and activities");
         }
-        return employeeDTOList;
+        return employees
+                .stream()
+                .filter(entity -> entity.getSkills().containsAll(employeeDTO.getSkills()))
+                .map(this::convertEntityToDTO)
+                .collect(Collectors.toList());
     }
 
     @Override

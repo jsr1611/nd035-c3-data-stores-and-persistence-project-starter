@@ -1,5 +1,6 @@
 package com.udacity.jdnd.course3.critter.schedule;
 
+import com.udacity.jdnd.course3.critter.common.NotFoundException;
 import com.udacity.jdnd.course3.critter.pet.Pet;
 import com.udacity.jdnd.course3.critter.pet.PetService;
 import com.udacity.jdnd.course3.critter.user.Employee;
@@ -85,6 +86,7 @@ public class ScheduleServiceImpl implements ScheduleService {
     public List<ScheduleDTO> getScheduleForPet(long petId) {
         List<Schedule> all = scheduleRepository.findAll();
         List<ScheduleDTO> result = new ArrayList<>();
+        throwExceptionIf(all, "No schedules were found in the system. Please, add some first.");
         for (Schedule schedule : all) {
             for (Pet pet : schedule.getPets()) {
                 if(pet.getId().equals(petId)){
@@ -93,12 +95,20 @@ public class ScheduleServiceImpl implements ScheduleService {
                 }
             }
         }
+        throwExceptionIf(result, "No schedules were found for the given pet id " + petId);
         return result;
+    }
+
+    private void throwExceptionIf(List<?> itemList, String errorMessage){
+        if(itemList.isEmpty()){
+            throw new NotFoundException(errorMessage);
+        }
     }
 
     @Override
     public List<ScheduleDTO> getScheduleForEmployee(long employeeId) {
         List<Schedule> all = scheduleRepository.findAll();
+        throwExceptionIf(all, "No schedules were found in the system. Please, add some first.");
         List<ScheduleDTO> result = new ArrayList<>();
         for (Schedule schedule : all) {
             for (Employee employee : schedule.getEmployees()) {
@@ -108,12 +118,14 @@ public class ScheduleServiceImpl implements ScheduleService {
                 }
             }
         }
+        throwExceptionIf(result, "No schedules were found for the given employee id " + employeeId);
         return result;
     }
 
     @Override
     public List<ScheduleDTO> getScheduleForCustomer(long customerId) {
         List<Schedule> all = scheduleRepository.findAll();
+        throwExceptionIf(all, "No schedules were found in the system. Please, add some first.");
         List<ScheduleDTO> result = new ArrayList<>();
         for (Schedule schedule : all) {
             for (Pet pet : schedule.getPets()) {
@@ -123,6 +135,7 @@ public class ScheduleServiceImpl implements ScheduleService {
                 }
             }
         }
+        throwExceptionIf(result, "No schedules were found for the given customer id " + customerId);
         return result;
     }
 }
