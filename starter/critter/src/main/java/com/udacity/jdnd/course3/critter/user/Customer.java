@@ -1,5 +1,6 @@
 package com.udacity.jdnd.course3.critter.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.udacity.jdnd.course3.critter.common.Creature;
 import com.udacity.jdnd.course3.critter.pet.Pet;
 
@@ -16,6 +17,7 @@ public class Customer extends Creature {
     private String phoneNumber;
     private String notes;
     @OneToMany(mappedBy = "owner", fetch = FetchType.LAZY)
+    @JsonIgnoreProperties("owner")
     private List<Pet> pets;
 
 

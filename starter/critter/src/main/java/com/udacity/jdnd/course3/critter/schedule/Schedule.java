@@ -15,16 +15,18 @@ public class Schedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @ManyToMany
     @JoinTable(
-            name = "schedule_employee", // Join table name
-            joinColumns = @JoinColumn(name = "schedule_id"), // Foreign key for Schedule
-            inverseJoinColumns = @JoinColumn(name = "employee_id") // Foreign key for Employee
+            name = "schedule_employee",
+            joinColumns = @JoinColumn(name = "schedule_id"),
+            inverseJoinColumns = @JoinColumn(name = "employee_id")
     )
     private List<Employee> employees;
+    @ManyToMany
     @JoinTable(
-            name = "schedule_pet", // Join table name
-            joinColumns = @JoinColumn(name = "schedule_id"), // Foreign key for Schedule
-            inverseJoinColumns = @JoinColumn(name = "pet_id") // Foreign key for Pet
+            name = "schedule_pet",
+            joinColumns = @JoinColumn(name = "schedule_id"),
+            inverseJoinColumns = @JoinColumn(name = "pet_id")
     )
     private List<Pet> pets;
     private LocalDate date;

@@ -3,9 +3,11 @@ package com.udacity.jdnd.course3.critter.pet;
 import com.udacity.jdnd.course3.critter.common.NotFoundException;
 import com.udacity.jdnd.course3.critter.user.Customer;
 import com.udacity.jdnd.course3.critter.user.CustomerRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -14,18 +16,26 @@ import java.util.stream.Collectors;
 @Transactional
 public class PetServiceImpl implements PetService{
 
-    private final PetRepository petRepository;
-    private final CustomerRepository customerRepository;
-
-    public PetServiceImpl(PetRepository petRepository, CustomerRepository customerRepository) {
-        this.petRepository = petRepository;
-        this.customerRepository = customerRepository;
-    }
+    @Autowired
+    private PetRepository petRepository;
+    @Autowired
+    private CustomerRepository customerRepository;
 
     @Override
     public PetDTO save(PetDTO petDTO) {
         Pet pet = convertDTOToEntity(petDTO);
         pet = petRepository.save(pet);
+
+        List<Pet> pets = pet.getOwner().getPets();
+        if(pets == null){
+            pets = new ArrayList<>();
+            pets.add(pet);
+        }else {
+            pets.add(pet);
+        }
+        Customer customer = pet.getOwner();
+        customer.setPets(pets);
+        customerRepository.save(customer);
         return convertEntityToDTO(pet);
     }
 

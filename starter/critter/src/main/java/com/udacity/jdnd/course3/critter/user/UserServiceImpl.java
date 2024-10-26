@@ -4,6 +4,7 @@ import com.udacity.jdnd.course3.critter.common.NotFoundException;
 import com.udacity.jdnd.course3.critter.pet.Pet;
 import com.udacity.jdnd.course3.critter.pet.PetService;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -16,15 +17,12 @@ import java.util.stream.Collectors;
 @Transactional
 public class UserServiceImpl implements UserService{
     private static final org.slf4j.Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
-    private final CustomerRepository customerRepository;
-    private final EmployeeRepository employeeRepository;
-    private final PetService petService;
-
-    public UserServiceImpl(CustomerRepository customerRepository, EmployeeRepository employeeRepository, PetService petService) {
-        this.customerRepository = customerRepository;
-        this.employeeRepository = employeeRepository;
-        this.petService = petService;
-    }
+    @Autowired
+    private CustomerRepository customerRepository;
+    @Autowired
+    private EmployeeRepository employeeRepository;
+    @Autowired
+    private PetService petService;
 
     @Override
     public CustomerDTO saveCustomer(CustomerDTO customerDTO) {

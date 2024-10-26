@@ -18,13 +18,10 @@ import java.util.Set;
 @RequestMapping("/user")
 public class UserController {
 
-    private final UserService userService;
-    private final PetService petService;
-
-    public UserController(UserService userService, PetService petService) {
-        this.userService = userService;
-        this.petService = petService;
-    }
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private PetService petService;
 
     @PostMapping("/customer")
     public CustomerDTO saveCustomer(@RequestBody CustomerDTO customerDTO){
